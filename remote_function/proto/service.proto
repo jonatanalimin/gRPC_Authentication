@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+service Service{
+    rpc sayPublic (sayRequest) returns (sayResponse) {}
+    rpc sayUser (sayRequest) returns (sayResponse) {}
+    rpc sayAdmin (sayRequest) returns (sayResponse) {}
+}
+
+message sayRequest {
+  string name = 1;
+}
+
+message sayResponse {
+  string reply = 1;
+}

@@ -1,0 +1,16 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="remote_function.proto.setting_pb2.*" />
+          <option value="cv2.*" />
+          <option value="remote_function.proto.home_pb2.*" />
+          <option value="object.*" />
+          <option value="PIL.Image.Resampling" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
