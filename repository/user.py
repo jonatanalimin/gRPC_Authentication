@@ -23,9 +23,13 @@ class UserRepository:
 
     def login(self, username: str, password: str):
         user = self.find_user(username)
-        if user is not None and self.password_is_valid(password, user.password):
-            return True, user
-        return False, None
+        if user is not None:
+            if self.password_is_valid(password, user.password):
+                return True, "", user
+            else:
+                return False, "Invalid password!", None
+        else:
+            return False, f"User {username} not found!", None
 
     @staticmethod
     def password_is_valid(password_params: str, stored_password: str):
