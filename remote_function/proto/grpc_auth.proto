@@ -2,6 +2,7 @@ syntax = "proto3";
 
 service AuthService{
     rpc login (loginRequest) returns (loginResponse) {}
+    rpc refreshing_token (refreshRequest) returns (refreshResponse) {}
 }
 
 message loginRequest {
@@ -10,5 +11,14 @@ message loginRequest {
 }
 
 message loginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message refreshRequest {
+  string refresh_token = 1;
+}
+
+message refreshResponse {
   string access_token = 1;
 }

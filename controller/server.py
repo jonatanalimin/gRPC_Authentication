@@ -26,14 +26,13 @@ class AuthorizationInterceptors(grpc.ServerInterceptor):
         token, header = None, None
 
         if handler_call_details.method in self.list_function.keys():
-
             for metadata in handler_call_details.invocation_metadata:
                 if metadata.key == "access_token":
                     token = metadata.value
 
             if token is not None:
                 try:
-                    header = self.jwt_manager.verify_jwt(token)
+                    header = self.jwt_manager.verify_jwt_access(token)
                 except Exception as e:
                     return self._unary_unary_rpc_terminator(grpc.StatusCode.UNAUTHENTICATED, e.__str__())
                 if header.get("role") not in self.list_function.get(handler_call_details.method):

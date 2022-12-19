@@ -19,12 +19,23 @@ class AuthServiceStub(object):
                 request_serializer=grpc__auth__pb2.loginRequest.SerializeToString,
                 response_deserializer=grpc__auth__pb2.loginResponse.FromString,
                 )
+        self.refreshing_token = channel.unary_unary(
+                '/AuthService/refreshing_token',
+                request_serializer=grpc__auth__pb2.refreshRequest.SerializeToString,
+                response_deserializer=grpc__auth__pb2.refreshResponse.FromString,
+                )
 
 
 class AuthServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def login(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def refreshing_token(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -37,6 +48,11 @@ def add_AuthServiceServicer_to_server(servicer, server):
                     servicer.login,
                     request_deserializer=grpc__auth__pb2.loginRequest.FromString,
                     response_serializer=grpc__auth__pb2.loginResponse.SerializeToString,
+            ),
+            'refreshing_token': grpc.unary_unary_rpc_method_handler(
+                    servicer.refreshing_token,
+                    request_deserializer=grpc__auth__pb2.refreshRequest.FromString,
+                    response_serializer=grpc__auth__pb2.refreshResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -62,5 +78,22 @@ class AuthService(object):
         return grpc.experimental.unary_unary(request, target, '/AuthService/login',
             grpc__auth__pb2.loginRequest.SerializeToString,
             grpc__auth__pb2.loginResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def refreshing_token(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/AuthService/refreshing_token',
+            grpc__auth__pb2.refreshRequest.SerializeToString,
+            grpc__auth__pb2.refreshResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

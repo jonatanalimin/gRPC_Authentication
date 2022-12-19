@@ -11,32 +11,54 @@ from utility.custom_error import JWTError
 
 class JWTManager:
     def __init__(self):
-        self.key = "secret"
         self.config = configparser.ConfigParser()
         self.config.read((os.path.dirname(sys.executable) + "/config/configuration.ini")
                          if getattr(sys, 'frozen', False) else os.getcwd() + "/config/configuration.ini")
-        self.expired_time = int(self.config["MIDDLEWARE"]["token_expired"])
+        self.algorithm = self.config["MIDDLEWARE"]["algorithm"]
+        self.access_key = self.config["MIDDLEWARE"]["access_token_signature"]
+        self.refresh_key = self.config["MIDDLEWARE"]["refresh_token_signature"]
+        self.access_token_expired_time = int(self.config["MIDDLEWARE"]["access_token_expired"])
+        self.refresh_token_expired_time = int(self.config["MIDDLEWARE"]["refresh_token_expired"])
 
     def create_jwt(self, user: UserModel):
+        return self.create_jwt_access(user), self.create_jwt_refresh(user)
+
+    def create_jwt_access(self, user: UserModel):
         return jwt.encode({
             "exp": calendar.timegm(
-                (datetime.datetime.utcnow() + datetime.timedelta(seconds=self.expired_time)).timetuple()
+                (datetime.datetime.utcnow() + datetime.timedelta(seconds=self.access_token_expired_time)).timetuple()
             ),
             "username": user.username,
             "role": user.role
-        }, self.key, algorithm="HS256")
+        }, self.access_key, algorithm=self.algorithm)
 
-    def verify_jwt(self, access_token: str):
+    def create_jwt_refresh(self, user: UserModel):
+        return jwt.encode({
+                   "exp": calendar.timegm(
+                       (datetime.datetime.utcnow() + datetime.timedelta(seconds=self.refresh_token_expired_time))
+                       .timetuple()), "username": user.username, "role": user.role
+               }, self.refresh_key, algorithm=self.algorithm)
+
+    def verify_jwt_access(self, access_token: str):
         try:
-            return(jwt.decode(access_token, self.key, "HS256", options={
+            return(jwt.decode(access_token, self.access_key, self.algorithm, options={
                 "verify_signature": True,
                 "require": ["exp", "role"]
             }))
         except Exception as e:
             raise JWTError(e.__str__())
 
+    def refreshing_token(self, refresh_token: str):
+        try:
+            data = jwt.decode(refresh_token, self.refresh_key, self.algorithm, options={
+                "verify_signature": True,
+                "require": ["exp", "username", "role"]
+            })
 
-if __name__ == '__main__':
-    JWTManager().verify_jwt("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkX2F"
-                            "0IjoxNjgxMTU5MTE4LCJ1c2VybmFtZSI6ImFkbWluIn0.MZvyPan03"
-                            "aOeRMgrB6nTAmtu539Y51az7YIa_zxA30Y")
+            user = UserModel()
+            user.username = data.get("username")
+            user.role = data.get("role")
+
+            return self.create_jwt_access(user)
+        except Exception as e:
+            raise JWTError(e.__str__())
