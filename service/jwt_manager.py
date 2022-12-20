@@ -10,6 +10,9 @@ from utility.custom_error import JWTError
 
 
 class JWTManager:
+    """
+    JWT Manager class which have function to create and verify JWT
+    """
     def __init__(self):
         self.config = configparser.ConfigParser()
         self.config.read((os.path.dirname(sys.executable) + "/config/configuration.ini")
@@ -21,9 +24,19 @@ class JWTManager:
         self.refresh_token_expired_time = int(self.config["MIDDLEWARE"]["refresh_token_expired"])
 
     def create_jwt(self, user: UserModel):
+        """
+        Creating JWT access token and refresh token when user login
+        :param user: (UserModel) User data
+        :return: (str) access token, (str) refresh token
+        """
         return self.create_jwt_access(user), self.create_jwt_refresh(user)
 
     def create_jwt_access(self, user: UserModel):
+        """
+        Creating JWT Access Token
+        :param user: (UserModel) user data
+        :return: (str) Access Token
+        """
         return jwt.encode({
             "exp": calendar.timegm(
                 (datetime.datetime.utcnow() + datetime.timedelta(seconds=self.access_token_expired_time)).timetuple()
@@ -33,6 +46,11 @@ class JWTManager:
         }, self.access_key, algorithm=self.algorithm)
 
     def create_jwt_refresh(self, user: UserModel):
+        """
+        Creating JWT Refresh Token
+        :param user: (UserModel) user data
+        :return: (str) Refresh Token
+        """
         return jwt.encode({
                    "exp": calendar.timegm(
                        (datetime.datetime.utcnow() + datetime.timedelta(seconds=self.refresh_token_expired_time))
@@ -40,6 +58,11 @@ class JWTManager:
                }, self.refresh_key, algorithm=self.algorithm)
 
     def verify_jwt_access(self, access_token: str):
+        """
+        Verifying access token
+        :param access_token: (str) access token
+        :return: dict(access token)
+        """
         try:
             return(jwt.decode(access_token, self.access_key, self.algorithm, options={
                 "verify_signature": True,
@@ -49,6 +72,11 @@ class JWTManager:
             raise JWTError(e.__str__())
 
     def refreshing_token(self, refresh_token: str):
+        """
+        Creating new access token using refresh token
+        :param refresh_token: (str) refresh token
+        :return: (str) access token
+        """
         try:
             data = jwt.decode(refresh_token, self.refresh_key, self.algorithm, options={
                 "verify_signature": True,

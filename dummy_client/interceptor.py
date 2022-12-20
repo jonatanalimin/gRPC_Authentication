@@ -10,18 +10,35 @@ from remote_function.proto import grpc_auth_pb2, grpc_auth_pb2_grpc
 
 
 class Interceptor:
+    """
+    Interceptor client-side class
+    """
     def __init__(self, grpc_server, access_token, refresh_token):
         self.refreshing_token = False
+
+        # 75% of access token expiry time
+        self.refresh_time = 7.5
+
         self.grpc_server = grpc_server
         self.access_token = access_token
         self.refresh_token = refresh_token
-        self.timer = Timer(7.5, self.on_refreshing_token)
+
+        # timer thread for refreshing token
+        self.timer = Timer(self.refresh_time, self.on_refreshing_token)
         self.timer.start()
 
     def is_on_refreshing_token(self):
+        """
+        Check is interceptor on refreshing token process
+        :return: (bool) is on refreshing
+        """
         return self.refreshing_token
 
     def on_refreshing_token(self):
+        """
+        Refreshing token function
+        :return:
+        """
         print("refreshing....")
         self.refreshing_token = True
         try:
@@ -33,12 +50,20 @@ class Interceptor:
         except Exception as e:
             print(e.__str__())
         finally:
-            self.timer = Timer(7.5, self.on_refreshing_token)
+            self.timer = Timer(self.refresh_time, self.on_refreshing_token)
             self.timer.start()
             self.refreshing_token = False
 
     def intercept_call(self, client_call_details, request_iterator, request_streaming,
                        response_streaming):
+        """
+        Intercepting request and adding metadata
+        :param client_call_details:
+        :param request_iterator:
+        :param request_streaming:
+        :param response_streaming:
+        :return:
+        """
         metadata = []
         if client_call_details.metadata is not None:
             metadata = list(client_call_details.metadata)
@@ -52,6 +77,10 @@ class Interceptor:
         return client_call_details, request_iterator, None
 
     def create(self):
+        """
+        Create interceptor request
+        :return:
+        """
         while self.is_on_refreshing_token():
             print("on waiting....")
             time.sleep(0.1)
@@ -59,6 +88,10 @@ class Interceptor:
         return _GenericClientInterceptor(self.intercept_call)
 
     def close(self):
+        """
+        Closing interceptor
+        :return:
+        """
         self.timer.cancel()
         print("closing interceptor...")
 

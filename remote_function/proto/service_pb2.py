@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\"\x1a\n\nsayRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1c\n\x0bsayResponse\x12\r\n\x05reply\x18\x01 \x01(\t2\x84\x01\n\x07Service\x12(\n\tsayPublic\x12\x0b.sayRequest\x1a\x0c.sayResponse\"\x00\x12&\n\x07sayUser\x12\x0b.sayRequest\x1a\x0c.sayResponse\"\x00\x12\'\n\x08sayAdmin\x12\x0b.sayRequest\x1a\x0c.sayResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\"\x1a\n\nsayRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x1c\n\x0bsayResponse\x12\r\n\x05reply\x18\x01 \x01(\t2\xb0\x01\n\x07Service\x12(\n\tsayPublic\x12\x0b.sayRequest\x1a\x0c.sayResponse\"\x00\x12&\n\x07sayUser\x12\x0b.sayRequest\x1a\x0c.sayResponse\"\x00\x12\'\n\x08sayAdmin\x12\x0b.sayRequest\x1a\x0c.sayResponse\"\x00\x12*\n\tsayStream\x12\x0b.sayRequest\x1a\x0c.sayResponse\"\x00\x30\x01\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'service_pb2', globals())
@@ -25,5 +25,5 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _SAYRESPONSE._serialized_start=45
   _SAYRESPONSE._serialized_end=73
   _SERVICE._serialized_start=76
-  _SERVICE._serialized_end=208
+  _SERVICE._serialized_end=252
 # @@protoc_insertion_point(module_scope)

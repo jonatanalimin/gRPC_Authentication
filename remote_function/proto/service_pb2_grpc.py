@@ -29,6 +29,11 @@ class ServiceStub(object):
                 request_serializer=service__pb2.sayRequest.SerializeToString,
                 response_deserializer=service__pb2.sayResponse.FromString,
                 )
+        self.sayStream = channel.unary_stream(
+                '/Service/sayStream',
+                request_serializer=service__pb2.sayRequest.SerializeToString,
+                response_deserializer=service__pb2.sayResponse.FromString,
+                )
 
 
 class ServiceServicer(object):
@@ -52,6 +57,12 @@ class ServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def sayStream(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -67,6 +78,11 @@ def add_ServiceServicer_to_server(servicer, server):
             ),
             'sayAdmin': grpc.unary_unary_rpc_method_handler(
                     servicer.sayAdmin,
+                    request_deserializer=service__pb2.sayRequest.FromString,
+                    response_serializer=service__pb2.sayResponse.SerializeToString,
+            ),
+            'sayStream': grpc.unary_stream_rpc_method_handler(
+                    servicer.sayStream,
                     request_deserializer=service__pb2.sayRequest.FromString,
                     response_serializer=service__pb2.sayResponse.SerializeToString,
             ),
@@ -126,6 +142,23 @@ class Service(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Service/sayAdmin',
+            service__pb2.sayRequest.SerializeToString,
+            service__pb2.sayResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def sayStream(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/Service/sayStream',
             service__pb2.sayRequest.SerializeToString,
             service__pb2.sayResponse.FromString,
             options, channel_credentials,
