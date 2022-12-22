@@ -14,7 +14,8 @@ class Auth(grpc_auth_pb2_grpc.AuthServiceServicer):
     gRPC trial's Auth service class
     """
     def __init__(self):
-        self.jwt_manager = JWTManager()
+        # TODO document why this method is empty
+        pass
 
     def login(self, request, context):
         """
@@ -28,7 +29,7 @@ class Auth(grpc_auth_pb2_grpc.AuthServiceServicer):
             user_repo = UserRepository()
             success, detail, user_object = user_repo.login(request.username, request.password)
             if success:
-                access_token, refresh_token = self.jwt_manager.create_jwt(user_object)
+                access_token, refresh_token = JWTManager().create_jwt(user_object)
                 return grpc_auth_pb2.loginResponse(
                     access_token=access_token,
                     refresh_token=refresh_token
@@ -55,7 +56,7 @@ class Auth(grpc_auth_pb2_grpc.AuthServiceServicer):
             logger.info("Get request to refresh the access token")
             try:
                 return grpc_auth_pb2.refreshResponse(
-                    access_token=self.jwt_manager.refreshing_token(request.refresh_token)
+                    access_token=JWTManager().refreshing_token(request.refresh_token)
                                                      )
             except Exception as e:
                 context.set_code(grpc.StatusCode.UNAUTHENTICATED)

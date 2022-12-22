@@ -49,6 +49,22 @@ class UserClient:
                 print(f"{cnt} - "
                       f"{service_pb2_grpc.ServiceStub(intercept_ch).sayUser(service_pb2.sayRequest(name=self.name))}")
 
+            for response in service_pb2_grpc.ServiceStub(intercept_ch) \
+                    .sayUnaryStream(service_pb2.sayRequest(name=self.name)):
+                print(response)
+
+            print(service_pb2_grpc.ServiceStub(intercept_ch).sayStreamUnary(self.stream_request()))
+
+            for response in service_pb2_grpc.ServiceStub(intercept_ch).sayStreamStream(self.stream_request()):
+                print(response)
+
+    @staticmethod
+    def stream_request():
+        for name in ["Messi", "Diaz", "Ronaldo",
+                     "Juergen", "Klopp", "Joeachim", "Klauus"]:
+            time.sleep(1.0)
+            yield service_pb2.sayRequest(name=name)
+
 
 class AdminClient:
     def __init__(self):
@@ -86,12 +102,24 @@ class AdminClient:
                 print(f"{cnt} - "
                       f"{service_pb2_grpc.ServiceStub(intercept_ch).sayAdmin(service_pb2.sayRequest(name=self.name))}")
 
-            for response in service_pb2_grpc.ServiceStub(intercept_ch)\
-                    .sayStream(service_pb2.sayRequest(name=self.name)):
+            for response in service_pb2_grpc.ServiceStub(intercept_ch) \
+                    .sayUnaryStream(service_pb2.sayRequest(name=self.name)):
                 print(response)
+
+            print(service_pb2_grpc.ServiceStub(intercept_ch).sayStreamUnary(self.stream_request()))
+
+            for response in service_pb2_grpc.ServiceStub(intercept_ch).sayStreamStream(self.stream_request()):
+                print(response)
+
+    @staticmethod
+    def stream_request():
+        for name in ["Messi", "Diaz", "Ronaldo",
+                     "Juergen", "Klopp", "Joeachim", "Klauus"]:
+            time.sleep(1.0)
+            yield service_pb2.sayRequest(name=name)
 
 
 if __name__ == '__main__':
-    PublicClient()
-    UserClient()
+    # PublicClient()
+    # UserClient()
     AdminClient()

@@ -25,9 +25,16 @@ class AuthorizationInterceptors(grpc.ServerInterceptor):
             "/Service/sayAdmin": ["admin"]
         }
         self.unary_stream_function = {
-            "/Service/sayStream": ["admin"]
+            "/Service/sayUnaryStream": ["admin", "user"]
         }
-        self.list_function = self.unary_unary_function | self.unary_stream_function
+        self.stream_unary_function = {
+            "/Service/sayStreamUnary": ["admin"]
+        }
+        self.stream_stream_function = {
+            "/Service/sayStreamStream": ["admin"]
+        }
+        self.list_function = self.unary_unary_function | self.unary_stream_function | self.stream_unary_function \
+            | self.stream_stream_function
 
     def terminator(self, method, code, details):
         """
@@ -41,6 +48,10 @@ class AuthorizationInterceptors(grpc.ServerInterceptor):
             return self._unary_unary_rpc_terminator(code, details)
         elif method in self.unary_stream_function.keys():
             return self._unary_stream_rpc_terminator(code, details)
+        elif method in self.stream_unary_function.keys():
+            return self._stream_unary_rpc_terminator(code, details)
+        else:
+            return self._stream_stream_rpc_terminator(code, details)
 
     @staticmethod
     def _unary_unary_rpc_terminator(code, details):
@@ -68,6 +79,34 @@ class AuthorizationInterceptors(grpc.ServerInterceptor):
 
         return grpc.unary_stream_rpc_method_handler(terminate)
 
+    @staticmethod
+    def _stream_unary_rpc_terminator(code, details):
+        """
+        Stream-Unary terminator
+        :param code: (str) the abort code
+        :param details: (str) the abort detail
+        :return: (object) an RpcMethodHandler object that is typically used by grpc.Server.
+        """
+
+        def terminate(ignored_request, context):
+            context.abort(code, details)
+
+        return grpc.stream_unary_rpc_method_handler(terminate)
+
+    @staticmethod
+    def _stream_stream_rpc_terminator(code, details):
+        """
+        Stream-Stream terminator
+        :param code: (str) the abort code
+        :param details: (str) the abort detail
+        :return: (object) an RpcMethodHandler object that is typically used by grpc.Server.
+        """
+
+        def terminate(ignored_request, context):
+            context.abort(code, details)
+
+        return grpc.stream_stream_rpc_method_handler(terminate)
+
     def intercept_service(self, continuation, handler_call_details):
         """
         Implement the abstract function of grpc.ServerInterceptor class;
@@ -79,7 +118,7 @@ class AuthorizationInterceptors(grpc.ServerInterceptor):
         or None otherwise.
         """
         token, header = None, None
-
+        logger.debug("Intercept a request")
         if handler_call_details.method in self.list_function.keys():
             for metadata in handler_call_details.invocation_metadata:
                 if metadata.key == "access_token":

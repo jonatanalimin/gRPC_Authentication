@@ -13,3 +13,7 @@ G
 +remote_function/proto/grpc_auth_pb2_grpc.py,9\4\946c88af2a9984b5d2a45a302328e46e0edd535a
 V
 &remote_function/proto/grpc_auth_pb2.py,0\a\0a5036cf4787e087ba0cdd905763d1658f75a056
+U
+%remote_function/proto/grpc_auth.proto,f\4\f485a8f41c26057ee2f015e8a0a3556f65356969
+=
+model/user.py,5\1\512aa88391fd633e6d80142d8d58f3c357ff0095

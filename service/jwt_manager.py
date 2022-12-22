@@ -1,5 +1,6 @@
 import calendar
 import configparser
+import logging
 import os
 import sys
 import datetime
@@ -7,6 +8,8 @@ import jwt
 
 from model.user import UserModel
 from utility.custom_error import JWTError
+
+logger = logging.getLogger(__name__)
 
 
 class JWTManager:

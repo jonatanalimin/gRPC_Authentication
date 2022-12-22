@@ -12,27 +12,31 @@ logger = logging.getLogger(__name__)
 
 class UserRepository:
     def __init__(self):
-        engine = create_engine(f"sqlite:///{application_path}/grpc_auth.db")
-        session_ = sessionmaker()
-        session_.configure(bind=engine)
-        self.session = session_()
+        self.engine = create_engine(f"sqlite:///{application_path}/grpc_auth.db")
 
-    def get_all(self):
+    def create_connection(self):
+        session_ = sessionmaker()
+        session_.configure(bind=self.engine)
+        return session_()
+
+    @staticmethod
+    def get_all(session):
         """
         Get all user at db
         :return: list[(UserModel) user data]
         """
         logger.info("Getting all user...")
-        return self.session.query(UserModel).all()
+        return session.query(UserModel).all()
 
-    def find_user(self, username: str):
+    @staticmethod
+    def find_user(session, username: str):
         """
         Searching user by username
         :param username: (str) username
         :return: (UserModel) user data
         """
         logger.info(f"Searching user with username {username}...")
-        return self.session.query(UserModel)\
+        return session.query(UserModel)\
             .filter(UserModel.username == username)\
             .first()
 
@@ -44,17 +48,23 @@ class UserRepository:
         :return: (bool) Success, (str) Error detail, (UserModel) user data
         """
         logger.info(f"Logining user with username: {username}; password: {password}")
-        user = self.find_user(username)
-        if user is not None:
-            if self.password_is_valid(password, user.password):
-                logger.info("Login success!")
-                return True, "", user
+        session = self.create_connection()
+        try:
+            user = self.find_user(session, username)
+            if user is not None:
+                if self.password_is_valid(password, user.password):
+                    logger.info("Login success!")
+                    return True, "", user
+                else:
+                    logger.warning("Invalid password!")
+                    return False, "Invalid password!", None
             else:
-                logger.warning("Invalid password!")
-                return False, "Invalid password!", None
-        else:
-            logger.warning(f"User {username} not found!")
-            return False, f"User {username} not found!", None
+                logger.warning(f"User {username} not found!")
+                return False, f"User {username} not found!", None
+        except Exception as e:
+            logger.error(e.__str__())
+        finally:
+            session.close()
 
     @staticmethod
     def password_is_valid(password_params: str, stored_password: str):

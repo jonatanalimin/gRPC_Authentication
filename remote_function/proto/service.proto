@@ -4,7 +4,9 @@ service Service{
     rpc sayPublic (sayRequest) returns (sayResponse) {}
     rpc sayUser (sayRequest) returns (sayResponse) {}
     rpc sayAdmin (sayRequest) returns (sayResponse) {}
-    rpc sayStream (sayRequest) returns (stream sayResponse) {}
+    rpc sayUnaryStream (sayRequest) returns (stream sayResponse) {}
+    rpc sayStreamUnary (stream sayRequest) returns (sayResponse) {}
+    rpc sayStreamStream (stream sayRequest) returns (stream sayResponse) {}
 }
 
 message sayRequest {

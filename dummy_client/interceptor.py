@@ -57,7 +57,7 @@ class Interceptor:
     def intercept_call(self, client_call_details, request_iterator, request_streaming,
                        response_streaming):
         """
-        Intercepting request and adding metadata
+        Intercepting request and adding metadata (this function will be called in every client request)
         :param client_call_details:
         :param request_iterator:
         :param request_streaming:
@@ -78,7 +78,7 @@ class Interceptor:
 
     def create(self):
         """
-        Create interceptor request
+        Create interceptor
         :return:
         """
         while self.is_on_refreshing_token():
